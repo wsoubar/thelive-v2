@@ -9,6 +9,17 @@ import { ClanCrest } from '../components/ClanCrest';
 
 type P = { id: string; nome: string; clan: string; seita: string; jogador: string; narrador: boolean; aprovado: boolean };
 type Info = { historia: string; rumores: string; antecedentes: string; planilha: string };
+type Ordem = 'nome' | 'cla' | 'seita' | 'jogador' | 'status';
+
+function compara(a: P, b: P, ordem: Ordem) {
+  switch (ordem) {
+    case 'cla': return a.clan.localeCompare(b.clan) || a.nome.localeCompare(b.nome);
+    case 'seita': return a.seita.localeCompare(b.seita) || a.nome.localeCompare(b.nome);
+    case 'jogador': return a.jogador.localeCompare(b.jogador) || a.nome.localeCompare(b.nome);
+    case 'status': return Number(b.aprovado) - Number(a.aprovado) || a.nome.localeCompare(b.nome);
+    default: return a.nome.localeCompare(b.nome);
+  }
+}
 
 function iniciais(nome: string) {
   return nome.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || '?';
@@ -37,6 +48,7 @@ export default function Personagens() {
   const isNarrador = profile?.roles?.narrador === true;
   const [items, setItems] = useState<P[]>([]);
   const [filtro, setFiltro] = useState('');
+  const [ordem, setOrdem] = useState<Ordem>('nome');
   const [aba, setAba] = useState<'todos' | 'aprovados' | 'pendentes'>('todos');
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [infos, setInfos] = useState<Record<string, Info>>({});
@@ -121,7 +133,8 @@ export default function Personagens() {
 
   const f = filtro.trim().toLowerCase();
   const porAba = aba === 'aprovados' ? items.filter((p) => p.aprovado) : aba === 'pendentes' ? items.filter((p) => !p.aprovado) : items;
-  const list = f ? porAba.filter((p) => [p.nome, p.clan, p.seita, p.jogador].join(' ').toLowerCase().includes(f)) : porAba;
+  const filtrados = f ? porAba.filter((p) => [p.nome, p.clan, p.seita, p.jogador, p.aprovado ? 'aprovado' : 'pendente'].join(' ').toLowerCase().includes(f)) : porAba;
+  const list = [...filtrados].sort((a, b) => compara(a, b, ordem));
   const nAp = items.filter((p) => p.aprovado).length;
   const nPen = items.length - nAp;
 
@@ -138,7 +151,19 @@ export default function Personagens() {
           <button className={`btn${aba === 'pendentes' ? ' btn-primary' : ''}`} onClick={() => setAba('pendentes')}>Pendentes ({nPen})</button>
         </div>
       )}
-      <input className="input" placeholder="Filtrar por nome, clã, seita…" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+      <div className="row">
+        <input className="input" style={{ flex: '1 1 200px' }} placeholder="Filtrar por nome, clã, seita, jogador, status…" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+        <label className="field" style={{ minWidth: 150 }}>
+          Ordenar
+          <select className="input" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>
+            <option value="nome">Nome</option>
+            <option value="cla">Clã</option>
+            <option value="seita">Seita</option>
+            <option value="jogador">Jogador</option>
+            <option value="status">Status</option>
+          </select>
+        </label>
+      </div>
       {loading && <p className="muted">Carregando…</p>}
       {error && <div className="alert alert-error">{error}</div>}
       {!loading && !error && list.length === 0 && <div className="card"><p className="muted">Nenhum personagem.</p></div>}
