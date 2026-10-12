@@ -151,8 +151,11 @@ export default function Personagens() {
           <button className={`btn${aba === 'pendentes' ? ' btn-primary' : ''}`} onClick={() => setAba('pendentes')}>Pendentes ({nPen})</button>
         </div>
       )}
-      <div className="row">
-        <input className="input" style={{ flex: '1 1 200px' }} placeholder="Filtrar por nome, clã, seita, jogador, status…" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+      <div className="row" style={{ alignItems: 'flex-end' }}>
+        <label className="field" style={{ flex: '1 1 200px' }}>
+          Filtrar
+          <input className="input" placeholder="Nome, clã, seita, jogador, status…" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+        </label>
         <label className="field" style={{ minWidth: 150 }}>
           Ordenar
           <select className="input" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>

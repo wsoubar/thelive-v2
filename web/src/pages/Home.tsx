@@ -112,14 +112,16 @@ export default function Home() {
             {isNarrador ? `${chars.length} no total` : `${chars.length} aprovados`}
           </span>
         </div>
-        <div className="row" style={{ marginTop: 12 }}>
-          <input
-            className="input"
-            style={{ flex: "1 1 200px" }}
-            placeholder="Filtrar por nome, clã, seita, jogador, status…"
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
+        <div className="row" style={{ marginTop: 12, alignItems: "flex-end" }}>
+          <label className="field" style={{ flex: "1 1 200px" }}>
+            Filtrar
+            <input
+              className="input"
+              placeholder="Nome, clã, seita, jogador, status…"
+              value={filtro}
+              onChange={(e) => setFiltro(e.target.value)}
+            />
+          </label>
           <label className="field" style={{ minWidth: 150 }}>
             Ordenar
             <select
