@@ -34,25 +34,32 @@ export default function PersonagemDetalhe() {
   }, [id]);
 
   return (
-    <main style={{ maxWidth: 720, margin: '24px auto', padding: 16 }}>
-      <p><Link to="/personagens">← Personagens</Link></p>
-      {loading && <p>Carregando…</p>}
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+    <>
+      <Link className="backlink" to="/personagens">← Personagens</Link>
+      {loading && <p className="muted">Carregando…</p>}
+      {error && <div className="alert alert-error">{error}</div>}
       {p && (
         <>
-          <h1>{p.nome}</h1>
-          <p>{p.seita} · {p.clan} · {p.jogador} {p.aprovado ? '' : '(não aprovado)'}</p>
-          {info && (
-            <>
-              {info.historia && <><h3>História</h3><p>{info.historia}</p></>}
-              {info.rumores && <><h3>Rumores</h3><p>{info.rumores}</p></>}
-              {info.antecedentes && <><h3>Antecedentes</h3><p>{info.antecedentes}</p></>}
-            </>
-          )}
-          <h3>XPs ({xps.length})</h3>
-          <ul>{xps.map((x) => <li key={x.id}>{x.descricao} — {x.valor}</li>)}</ul>
+          <div className="page-head">
+            <h1>{p.nome}</h1>
+            <p>{p.seita} · {p.clan} · {p.jogador} {!p.aprovado && <span className="badge">não aprovado</span>}</p>
+          </div>
+          <div className="stack">
+            {info?.historia && <div className="card"><h3 style={{ marginTop: 0 }}>História</h3><p>{info.historia}</p></div>}
+            {info?.rumores && <div className="card"><h3 style={{ marginTop: 0 }}>Rumores</h3><p>{info.rumores}</p></div>}
+            {info?.antecedentes && <div className="card"><h3 style={{ marginTop: 0 }}>Antecedentes</h3><p>{info.antecedentes}</p></div>}
+            <div className="card">
+              <div className="spread"><h3 style={{ margin: 0 }}>XPs</h3><span className="badge">{xps.length}</span></div>
+              {xps.length === 0 && <p className="muted small">Sem XPs registrados.</p>}
+              {xps.map((x) => (
+                <div key={x.id} className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 8, marginTop: 8 }}>
+                  <span>{x.descricao}</span><b>{x.valor}</b>
+                </div>
+              ))}
+            </div>
+          </div>
         </>
       )}
-    </main>
+    </>
   );
 }

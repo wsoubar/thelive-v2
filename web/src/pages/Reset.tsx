@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 import { auth } from '../lib/firebase';
+import { AuthShell } from '../components/Layout';
 
 export default function Reset() {
   const [email, setEmail] = useState('');
@@ -10,9 +11,8 @@ export default function Reset() {
   const invalid = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
   return (
-    <main style={{ maxWidth: 420, margin: '48px auto', padding: 16 }}>
-      <h1>Live Action — recuperar senha</h1>
-      <form onSubmit={async (e) => {
+    <AuthShell title="Recuperar senha" subtitle="Enviamos um link de reset para o seu e-mail.">
+      <form className="stack" onSubmit={async (e) => {
         e.preventDefault();
         setErr(''); setOk(false);
         if (invalid) { setErr('E-mail inválido.'); return; }
@@ -23,12 +23,12 @@ export default function Reset() {
           setErr('Não foi possível enviar. Confira o e-mail.');
         }
       }}>
-        <input placeholder="e-mail" value={email} onChange={(e) => setEmail(e.target.value)} style={{ display: 'block', width: '100%', margin: '8px 0', padding: 10 }} />
-        {err && <p style={{ color: 'crimson' }}>{err}</p>}
-        {ok && <p>Em instantes você recebe o e-mail de reset.</p>}
-        <button type="submit" disabled={invalid} style={{ padding: '10px 16px' }}>Resetar senha</button>
+        <label className="field">E-mail<input className="input" placeholder="voce@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+        {err && <div className="alert alert-error">{err}</div>}
+        {ok && <div className="alert alert-ok">Em instantes você recebe o e-mail de reset.</div>}
+        <button className="btn btn-primary" type="submit" disabled={invalid}>Resetar senha</button>
       </form>
-      <p><Link to="/login">Voltar ao login</Link></p>
-    </main>
+      <p className="small muted" style={{ marginTop: 14 }}><Link to="/login">Voltar ao login</Link></p>
+    </AuthShell>
   );
 }

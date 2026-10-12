@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
+import { Layout } from './components/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Reset from './pages/Reset';
@@ -19,12 +20,12 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/reset" element={<Reset />} />
-          <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
-          <Route path="/personagens" element={<RequireAuth><Personagens /></RequireAuth>} />
-          <Route path="/personagens/:id" element={<RequireAuth><PersonagemDetalhe /></RequireAuth>} />
-          <Route path="/acoes" element={<RequireAuth><Acoes /></RequireAuth>} />
-          <Route path="/chats" element={<RequireAuth><Placeholder title="Chats" /></RequireAuth>} />
-          <Route path="/dados" element={<RequireAuth><Dados /></RequireAuth>} />
+          <Route path="/" element={<RequireAuth><Layout><Home /></Layout></RequireAuth>} />
+          <Route path="/personagens" element={<RequireAuth><Layout><Personagens /></Layout></RequireAuth>} />
+          <Route path="/personagens/:id" element={<RequireAuth><Layout><PersonagemDetalhe /></Layout></RequireAuth>} />
+          <Route path="/acoes" element={<RequireAuth><Layout><Acoes /></Layout></RequireAuth>} />
+          <Route path="/chats" element={<RequireAuth><Layout><Placeholder title="Chats" /></Layout></RequireAuth>} />
+          <Route path="/dados" element={<RequireAuth><Layout><Dados /></Layout></RequireAuth>} />
         </Routes>
       </AuthProvider>
     </HashRouter>

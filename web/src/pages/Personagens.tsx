@@ -39,26 +39,30 @@ export default function Personagens() {
   const list = f ? items.filter((p) => [p.nome, p.clan, p.seita, p.jogador].join(' ').toLowerCase().includes(f)) : items;
 
   return (
-    <main style={{ maxWidth: 720, margin: '24px auto', padding: 16 }}>
-      <p><Link to="/">← Início</Link></p>
-      <h1>Personagens</h1>
-      <input placeholder="filtrar por nome, clã, seita…" value={filtro} onChange={(e) => setFiltro(e.target.value)} style={{ display: 'block', width: '100%', padding: 10, margin: '8px 0' }} />
-      {loading && <p>Carregando…</p>}
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      {!loading && !error && list.length === 0 && <p>Nenhum personagem.</p>}
-      {list.map((p) => (
-        <div key={p.id} style={{ border: '1px solid #e5e4e7', borderRadius: 8, margin: '8px 0', padding: 12 }}>
-          <div onClick={() => setOpen((o) => ({ ...o, [p.id]: !o[p.id] }))} style={{ display: 'flex', gap: 12, alignItems: 'center', cursor: 'pointer' }}>
-            <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#eee', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{iniciais(p.nome)}</span>
-            <div>
-              <b>{p.nome}</b> — <Link to={`/personagens/${p.id}`}>detalhe</Link>
-              <div>{p.seita} · {p.clan}</div>
-              <div>{p.narrador ? 'Narrador' : 'Jogador'}: <b>{p.jogador}</b></div>
+    <>
+      <div className="page-head">
+        <h1>Personagens</h1>
+        <p>{list.length} aprovados · toque para ver rumores</p>
+      </div>
+      <input className="input" placeholder="Filtrar por nome, clã, seita…" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
+      {loading && <p className="muted">Carregando…</p>}
+      {error && <div className="alert alert-error">{error}</div>}
+      {!loading && !error && list.length === 0 && <div className="card"><p className="muted">Nenhum personagem.</p></div>}
+      <div className="stack" style={{ marginTop: 12 }}>
+        {list.map((p) => (
+          <div key={p.id} className="card list-item" onClick={() => setOpen((o) => ({ ...o, [p.id]: !o[p.id] }))}>
+            <div className="row">
+              <span className="avatar">{iniciais(p.nome)}</span>
+              <div>
+                <b>{p.nome}</b> <Link to={`/personagens/${p.id}`} onClick={(e) => e.stopPropagation()}>detalhe</Link>
+                <div className="small muted">{p.seita} · {p.clan}</div>
+                <div className="small">{p.narrador ? <span className="badge badge-narrador">Narrador</span> : <span className="badge">Jogador</span>} <b>{p.jogador}</b></div>
+              </div>
             </div>
+            {open[p.id] && p.rumores && <p className="small" style={{ marginTop: 10, borderTop: '1px solid var(--line)', paddingTop: 10 }}>{p.rumores}</p>}
           </div>
-          {open[p.id] && p.rumores && <p style={{ marginTop: 8 }}>{p.rumores}</p>}
-        </div>
-      ))}
-    </main>
+        ))}
+      </div>
+    </>
   );
 }

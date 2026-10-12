@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, limit, query, where } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
-import { Link, useNavigate } from 'react-router-dom';
-import { auth, db } from '../lib/firebase';
+import { Link } from 'react-router-dom';
+import { db } from '../lib/firebase';
 import { useAuth } from '../auth/AuthContext';
 
 type Char = { id: string; nome: string; clan: string; seita: string };
 
 export default function Home() {
   const { user, profile, profileError } = useAuth();
-  const nav = useNavigate();
   const [chars, setChars] = useState<Char[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,23 +28,40 @@ export default function Home() {
   }, []);
 
   return (
-    <main style={{ maxWidth: 720, margin: '24px auto', padding: 16 }}>
-      <h1>Live Action 🧛</h1>
-      <p>Olá, {user?.email} {isNarrador && '(narrador)'}</p>
-      {!profile && !profileError && <p style={{ color: '#a16207' }}>Sem doc em users/{user?.uid} — crie no Firestore com roles.narrador se for narrador.</p>}
-      {profileError && <p style={{ color: 'crimson' }}>Perfil: {profileError}</p>}
-      <p><button onClick={async () => { await signOut(auth); nav('/login'); }}>Sair</button></p>
-      <nav style={{ display: 'flex', gap: 12, margin: '16px 0' }}>
-        <Link to="/personagens">Personagens</Link>
-        <Link to="/acoes">Ações</Link>
-        <Link to="/chats">Chats</Link>
-        <Link to="/dados">Dados</Link>
-      </nav>
-      <h2>Aprovados (amostra)</h2>
-      {loading && <p>Carregando personagens…</p>}
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      {!loading && !error && chars.length === 0 && <p>Nenhum aprovado encontrado.</p>}
-      <ul>{chars.map((c) => <li key={c.id}>{c.nome} — {c.clan}/{c.seita}</li>)}</ul>
-    </main>
+    <>
+      <div className="page-head spread">
+        <div>
+          <h1>Crônica</h1>
+          <p>Olá, {user?.email} {isNarrador && <span className="badge badge-narrador">narrador</span>}</p>
+        </div>
+        <Link className="btn btn-primary" to="/acoes">Enviar ação</Link>
+      </div>
+
+      {!profile && !profileError && (
+        <div className="alert alert-warn">Sem doc em <b>users/{user?.uid}</b> — crie no Firestore com <b>roles.narrador</b> se for narrador.</div>
+      )}
+      {profileError && <div className="alert alert-error">Perfil: {profileError}</div>}
+
+      <div className="row" style={{ margin: '16px 0' }}>
+        <Link className="btn" to="/personagens">Personagens</Link>
+        <Link className="btn" to="/acoes">Ações</Link>
+        <Link className="btn" to="/dados">Dados d10</Link>
+      </div>
+
+      <div className="card">
+        <div className="spread"><h2 style={{ margin: 0 }}>Aprovados</h2><span className="muted small">amostra · 20</span></div>
+        {loading && <p className="muted">Carregando personagens…</p>}
+        {error && <div className="alert alert-error">{error}</div>}
+        {!loading && !error && chars.length === 0 && <p className="muted">Nenhum aprovado encontrado.</p>}
+        <div className="stack" style={{ marginTop: 12 }}>
+          {chars.map((c) => (
+            <div key={c.id} className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 10 }}>
+              <span><b>{c.nome}</b> <span className="muted">· {c.clan} / {c.seita}</span></span>
+              <Link className="small" to="/personagens">ver</Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }

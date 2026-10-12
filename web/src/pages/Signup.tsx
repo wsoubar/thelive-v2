@@ -3,8 +3,7 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../lib/firebase';
-
-const input = { display: 'block', width: '100%', margin: '8px 0', padding: 10 } as const;
+import { AuthShell } from '../components/Layout';
 
 function msg(code: string) {
   if (code.includes('email-already-in-use')) return 'E-mail já cadastrado. Tente entrar ou resetar a senha.';
@@ -20,7 +19,6 @@ export default function Signup() {
   const [pass, setPass] = useState('');
   const [pass2, setPass2] = useState('');
   const [err, setErr] = useState('');
-  const [ok, setOk] = useState(false);
 
   const invalid =
     nome.trim().length < 7 || nome.trim().length > 30 ||
@@ -28,9 +26,8 @@ export default function Signup() {
     pass.length < 6 || pass.length > 15 || pass !== pass2;
 
   return (
-    <main style={{ maxWidth: 420, margin: '48px auto', padding: 16 }}>
-      <h1>Live Action — criar conta</h1>
-      <form onSubmit={async (e) => {
+    <AuthShell title="Criar conta" subtitle="Nome 7–30 caracteres · senha 6–15 caracteres.">
+      <form className="stack" onSubmit={async (e) => {
         e.preventDefault();
         setErr('');
         if (invalid) { setErr('Confira nome (7-30), e-mail e senha (6-15, iguais).'); return; }
@@ -40,21 +37,19 @@ export default function Signup() {
           await setDoc(doc(db, 'users', cred.user.uid), {
             personagemId: null, displayName: nome.trim(), roles: { narrador: false },
           });
-          setOk(true);
           nav('/');
         } catch (er) {
           setErr(msg(er instanceof Error ? er.message : ''));
         }
       }}>
-        <input placeholder="Nome (7-30 caracteres)" value={nome} onChange={(e) => setNome(e.target.value)} style={input} />
-        <input placeholder="e-mail" value={email} onChange={(e) => setEmail(e.target.value)} style={input} />
-        <input placeholder="senha (6-15)" type="password" value={pass} onChange={(e) => setPass(e.target.value)} style={input} />
-        <input placeholder="confirmar senha" type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} style={input} />
-        {err && <p style={{ color: 'crimson' }}>{err}</p>}
-        {ok && <p>Conta criada.</p>}
-        <button type="submit" disabled={invalid} style={{ padding: '10px 16px' }}>Confirmar</button>
+        <label className="field">Nome<input className="input" placeholder="Seu nome e sobrenome" value={nome} onChange={(e) => setNome(e.target.value)} /></label>
+        <label className="field">E-mail<input className="input" placeholder="voce@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+        <label className="field">Senha<input className="input" placeholder="6 a 15 caracteres" type="password" value={pass} onChange={(e) => setPass(e.target.value)} /></label>
+        <label className="field">Confirmar senha<input className="input" placeholder="repita a senha" type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} /></label>
+        {err && <div className="alert alert-error">{err}</div>}
+        <button className="btn btn-primary" type="submit" disabled={invalid}>Confirmar</button>
       </form>
-      <p><Link to="/login">Voltar ao login</Link></p>
-    </main>
+      <p className="small muted" style={{ marginTop: 14 }}><Link to="/login">Voltar ao login</Link></p>
+    </AuthShell>
   );
 }
