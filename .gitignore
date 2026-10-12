@@ -1,0 +1,18 @@
+# deps / build
+node_modules/
+dist/
+.android/
+.ios/
+
+# firebase local
+.firebase/
+*.log
+
+# segredos — NUNCA commitar
+**/*service-account*.json
+**/*firebase-adminsdk*.json
+tmp/
+*.export.json
+.env
+.env.local
+.webhintrc

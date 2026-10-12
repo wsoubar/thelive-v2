@@ -1,0 +1,23 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "acoes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "data", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "personagens",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aprovado", "order": "ASCENDING" },
+        { "fieldPath": "seita", "order": "ASCENDING" },
+        { "fieldPath": "clan", "order": "ASCENDING" },
+        { "fieldPath": "nome", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

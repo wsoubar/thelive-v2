@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isNarrador() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.narrador == true;
+    }
+    function isOwner(userId) { return signedIn() && request.auth.uid == userId; }
+
+    // Usuários: cada um lê/escreve o próprio doc; narrador lê todos
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isNarrador();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isNarrador();
+      allow delete: if false;
+    }
+
+    // Personagens: lista pública só de aprovados; detalhe do dono + narrador
+    match /personagens/{pid} {
+      allow read: if resource.data.aprovado == true || isNarrador()
+        || (signedIn() && resource.data.userid == request.auth.uid);
+      allow create: if signedIn();
+      allow update: if signedIn()
+        && (resource.data.userid == request.auth.uid || isNarrador());
+      allow delete: if isNarrador();
+
+      match /info/{doc} {
+        allow read: if get(/databases/$(database)/documents/personagens/$(pid)).data.aprovado == true
+          || isNarrador()
+          || (signedIn() && get(/databases/$(database)/documents/personagens/$(pid)).data.userid == request.auth.uid);
+        allow write: if signedIn()
+          && (get(/databases/$(database)/documents/personagens/$(pid)).data.userid == request.auth.uid
+            || isNarrador());
+      }
+
+      match /xps/{xid} {
+        allow read: if signedIn()
+          && (get(/databases/$(database)/documents/personagens/$(pid)).data.userid == request.auth.uid
+            || isNarrador());
+        allow write: if isNarrador();
+      }
+    }
+
+    // Ações: jogador cria a sua, lê as suas; narrador lê/responde tudo
+    match /acoes/{aid} {
+      allow read: if signedIn()
+        && (resource.data.userid == request.auth.uid || isNarrador());
+      allow create: if signedIn()
+        && request.resource.data.userid == request.auth.uid
+        && request.resource.data.status == 'open';
+      allow update: if isNarrador()
+        || (signedIn() && resource.data.userid == request.auth.uid
+          && resource.data.status == 'open'
+          && request.resource.data.status == 'open');
+      allow delete: if signedIn()
+        && resource.data.userid == request.auth.uid
+        && resource.data.status == 'open';
+    }
+
+    // Chats: membros da sala + narradores
+    match /chats/{chatId} {
+      allow read: if signedIn()
+        && (request.auth.uid in resource.data.members || isNarrador());
+      allow create, update: if isNarrador();
+      allow delete: if false;
+
+      match /messages/{mid} {
+        allow read: if signedIn()
+          && (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.members
+            || isNarrador());
+        allow create: if signedIn()
+          && (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.members
+            || isNarrador())
+          && request.resource.data.userid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    // Listas de referência: leitura pública logada, escrita só narrador
+    match /citacoes/{id} { allow read: if signedIn(); allow write: if isNarrador(); }
+    match /clans/{id} { allow read: if true; allow write: if isNarrador(); }
+    match /seitas/{id} { allow read: if true; allow write: if isNarrador(); }
+  }
+}
