@@ -26,7 +26,9 @@ export default function Dados() {
       </div>
       {sucessos !== null && (
         <div className="card" style={{ marginTop: 12, borderColor: ok ? '#9ed9b8' : '#f3c2c4' }}>
-          <b>{sucessos} sucesso(s)</b> — {ok ? 'Sucesso!' : 'Falha.'}
+          <b>{sucessos} sucesso(s)</b> — {ok
+            ? <b style={{ color: 'var(--ok)' }}>Sucesso</b>
+            : <b style={{ color: 'var(--danger)' }}>Falha</b>}
           <div className="dice">{rolagem.map((d, i) => <span key={i} className={`die${d >= dificuldade ? ' hit' : ''}`}>{d}</span>)}</div>
         </div>
       )}
