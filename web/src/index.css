@@ -229,6 +229,8 @@ label.field span.hint { font-weight: 500; color: var(--muted); }
   color: #3d4451;
 }
 .badge-narrador { background: var(--brand-soft); border-color: #efc3ca; color: var(--brand); }
+.badge-aprovado { background: #e3edff; border-color: #b3ccff; color: #1d4ed8; }
+.badge-pendente { background: #fdf3d7; border-color: #eed88f; color: #8a6100; }
 
 .avatar {
   width: 44px;

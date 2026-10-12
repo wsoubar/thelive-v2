@@ -151,8 +151,8 @@ export default function Home() {
               <div>
                 <b>{c.nome}</b>{" "}
                 {c.aprovado
-                  ? <span className="badge">aprovado</span>
-                  : <span className="badge">pendente</span>}
+                  ? <span className="badge badge-aprovado">aprovado</span>
+                  : <span className="badge badge-pendente">pendente</span>}
                 <div className="small muted">
                   {c.clan} · {c.seita} · {c.jogador}
                 </div>
