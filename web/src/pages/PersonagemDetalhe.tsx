@@ -45,9 +45,11 @@ export default function PersonagemDetalhe() {
             <p>{p.seita} · {p.clan} · {p.jogador} {!p.aprovado && <span className="badge">não aprovado</span>}</p>
           </div>
           <div className="stack">
-            {info?.historia && <div className="card"><h3 style={{ marginTop: 0 }}>História</h3><p>{info.historia}</p></div>}
-            {info?.rumores && <div className="card"><h3 style={{ marginTop: 0 }}>Rumores</h3><p>{info.rumores}</p></div>}
-            {info?.antecedentes && <div className="card"><h3 style={{ marginTop: 0 }}>Antecedentes</h3><p>{info.antecedentes}</p></div>}
+            {info?.historia && <div className="card"><h3 style={{ marginTop: 0 }}>História</h3><p style={{ whiteSpace: 'pre-wrap' }}>{info.historia}</p></div>}
+            {info?.rumores && <div className="card"><h3 style={{ marginTop: 0 }}>Rumores</h3><p style={{ whiteSpace: 'pre-wrap' }}>{info.rumores}</p></div>}
+            {info?.antecedentes && <div className="card"><h3 style={{ marginTop: 0 }}>Antecedentes</h3><p style={{ whiteSpace: 'pre-wrap' }}>{info.antecedentes}</p></div>}
+            {info?.planilha && <div className="card"><h3 style={{ marginTop: 0 }}>Planilha</h3><p style={{ whiteSpace: 'pre-wrap' }}>{info.planilha}</p></div>}
+            {!info && <div className="card"><p className="muted small">Sem ficha (história/planilha/rumores/antecedentes) para este personagem.</p></div>}
             <div className="card">
               <div className="spread"><h3 style={{ margin: 0 }}>XPs</h3><span className="badge">{xps.length}</span></div>
               {xps.length === 0 && <p className="muted small">Sem XPs registrados.</p>}
