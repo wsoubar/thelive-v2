@@ -4,7 +4,22 @@ import { serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../auth/AuthContext';
 
-type Acao = { id: string; nomePersonagem: string; acao: string; resposta: string; narrador: string; data: { toDate?: () => Date } | null; status: string };
+type Acao = { id: string; nomePersonagem: string; acao: string; resposta: string; narrador: string; data: { toDate?: () => Date } | null; dataResposta: { toDate?: () => Date } | null; status: string };
+
+function fmtData(d: { toDate?: () => Date } | null | undefined) {
+  try {
+    const t = d?.toDate ? d.toDate() : null;
+    if (!t) return '—';
+    const dd = String(t.getDate()).padStart(2, '0');
+    const mm = String(t.getMonth() + 1).padStart(2, '0');
+    const yyyy = t.getFullYear();
+    const hh = String(t.getHours()).padStart(2, '0');
+    const mi = String(t.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+  } catch {
+    return '—';
+  }
+}
 
 export default function Acoes() {
   const { user, profile } = useAuth();
@@ -84,8 +99,9 @@ export default function Acoes() {
         {items.map((a) => (
           <div key={a.id} className="card">
             <div className="spread"><b>{a.nomePersonagem}</b><span className="badge">{a.status === 'open' && !a.resposta ? 'aberta' : 'respondida'}</span></div>
+            <div className="small muted">Enviada em {fmtData(a.data)}</div>
             <p style={{ marginTop: 8 }}>{a.acao}</p>
-            {a.resposta && <div className="alert alert-info" style={{ marginTop: 10 }}><b>Resposta ({a.narrador})</b><br />{a.resposta}</div>}
+            {a.resposta && <div className="alert alert-info" style={{ marginTop: 10 }}><b>Resposta ({a.narrador})</b> <span className="small">· {fmtData(a.dataResposta)}</span><br />{a.resposta}</div>}
             {!a.resposta && !isNarrador && (
               <div className="row" style={{ marginTop: 10 }}><button className="btn btn-ghost" onClick={async () => { await deleteDoc(doc(db, 'acoes', a.id)); await load(); }}>Apagar</button></div>
             )}

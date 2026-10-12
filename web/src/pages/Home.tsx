@@ -3,6 +3,7 @@ import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { useAuth } from '../auth/AuthContext';
+import { ClanCrest } from '../components/ClanCrest';
 
 type Char = { id: string; nome: string; clan: string; seita: string };
 
@@ -53,12 +54,15 @@ export default function Home() {
         {loading && <p className="muted">Carregando personagens…</p>}
         {error && <div className="alert alert-error">{error}</div>}
         {!loading && !error && chars.length === 0 && <p className="muted">Nenhum aprovado encontrado.</p>}
-        <div className="stack" style={{ marginTop: 12 }}>
+        <div className="cards-grid" style={{ marginTop: 12 }}>
           {chars.map((c) => (
-            <div key={c.id} className="row" style={{ justifyContent: 'space-between', borderTop: '1px solid var(--line)', paddingTop: 10 }}>
-              <span><b>{c.nome}</b> <span className="muted">· {c.clan} / {c.seita}</span></span>
-              <Link className="small" to="/personagens">ver</Link>
-            </div>
+            <Link key={c.id} className="card home-card" to={`/personagens/${c.id}`}>
+              <ClanCrest clan={c.clan} size={52} />
+              <div>
+                <b>{c.nome}</b>
+                <div className="small muted">{c.clan} · {c.seita}</div>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

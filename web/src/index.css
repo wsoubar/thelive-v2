@@ -132,7 +132,12 @@ a:hover { text-decoration: underline; }
 }
 
 .btn-sm { padding: 8px 12px; min-height: 44px; }
-.btn-logout { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+.topbar .btn-logout {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
+.topbar .btn-logout:hover { background: rgba(255, 255, 255, 0.18); box-shadow: none; }
 
 .bottomnav { display: none; }
 
@@ -240,6 +245,12 @@ label.field span.hint { font-weight: 500; color: var(--muted); }
   box-shadow: var(--shadow);
 }
 
+.avatar-img {
+  object-fit: contain;
+  padding: 4px;
+  background: #fff;
+}
+
 .list-item { cursor: pointer; }
 .list-item:hover { border-color: #c9cfd8; }
 
@@ -277,6 +288,21 @@ label.field span.hint { font-weight: 500; color: var(--muted); }
 .die.hit { background: var(--ok-bg); border-color: #9ed9b8; color: var(--ok); }
 
 input[type='range'] { accent-color: var(--brand); }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.home-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: inherit;
+  transition: transform 0.08s ease, box-shadow 0.2s;
+}
+.home-card:hover { text-decoration: none; box-shadow: 0 4px 20px -4px rgba(16, 24, 40, 0.2); transform: translateY(-1px); }
 
 .backlink { display: inline-block; margin-bottom: 12px; font-weight: 700; font-size: 14px; }
 

@@ -1,15 +1,35 @@
 import { useEffect, useState } from 'react';
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
 
 import { useAuth } from '../auth/AuthContext';
+import { clanLogo } from '../lib/clanlogo';
+import { ClanCrest } from '../components/ClanCrest';
 
 type P = { id: string; nome: string; clan: string; seita: string; jogador: string; narrador: boolean; aprovado: boolean };
 type Info = { historia: string; rumores: string; antecedentes: string; planilha: string };
 
 function iniciais(nome: string) {
   return nome.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || '?';
+}
+
+function Brasao({ clan, nome }: { clan: string; nome: string }) {
+  const [falhou, setFalhou] = useState(false);
+  const src = clanLogo(clan);
+  // PNG real quando existir; senão emblema SVG do clã; iniciais como último recurso.
+  if (src && !falhou) {
+    return (
+      <img
+        src={src}
+        alt={`Brasão ${clan}`}
+        className="avatar avatar-img"
+        onError={() => setFalhou(true)}
+      />
+    );
+  }
+  if (clan?.trim()) return <ClanCrest clan={clan} />;
+  return <span className="avatar">{iniciais(nome)}</span>;
 }
 
 export default function Personagens() {
@@ -20,9 +40,13 @@ export default function Personagens() {
   const [aba, setAba] = useState<'todos' | 'aprovados' | 'pendentes'>('todos');
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [infos, setInfos] = useState<Record<string, Info>>({});
+  const [ficha, setFicha] = useState<Record<string, boolean>>({});
   const [infoLoading, setInfoLoading] = useState<Record<string, boolean>>({});
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const temConteudo = (i?: Info) => !!i && [i.historia, i.planilha, i.rumores, i.antecedentes].some((v) => (v ?? '').trim().length > 0);
 
   const toggle = async (pid: string) => {
     const willOpen = !open[pid];
@@ -58,6 +82,22 @@ export default function Personagens() {
         const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<P, 'id'>) }));
         list.sort((a, b) => [a.seita, a.clan, a.nome].join('|').localeCompare([b.seita, b.clan, b.nome].join('|')));
         setItems(list);
+        // Ícone de ficha: confere info/principal de cada um (leitura única, com cache).
+        const got = await Promise.all(list.map(async (p) => {
+          try {
+            const s = await getDoc(doc(db, 'personagens', p.id, 'info', 'principal'));
+            return [p.id, s.exists() ? (s.data() as Info) : undefined] as const;
+          } catch {
+            return [p.id, undefined] as const;
+          }
+        }));
+        const im: Record<string, Info> = {};
+        const fm: Record<string, boolean> = {};
+        for (const [pid, info] of got) {
+          if (info) { im[pid] = info; fm[pid] = temConteudo(info); }
+        }
+        setInfos((m) => ({ ...im, ...m }));
+        setFicha(fm);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Falha ao carregar.');
       } finally {
@@ -65,6 +105,19 @@ export default function Personagens() {
       }
     })();
   }, [isNarrador]);
+
+  const aprovar = async (pid: string, aprovado: boolean) => {
+    setSaving((s) => ({ ...s, [pid]: true }));
+    setError('');
+    try {
+      await updateDoc(doc(db, 'personagens', pid), { aprovado });
+      setItems((arr) => arr.map((p) => (p.id === pid ? { ...p, aprovado } : p)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Falha ao atualizar aprovação.');
+    } finally {
+      setSaving((s) => ({ ...s, [pid]: false }));
+    }
+  };
 
   const f = filtro.trim().toLowerCase();
   const porAba = aba === 'aprovados' ? items.filter((p) => p.aprovado) : aba === 'pendentes' ? items.filter((p) => !p.aprovado) : items;
@@ -93,11 +146,20 @@ export default function Personagens() {
         {list.map((p) => (
           <div key={p.id} className="card list-item" onClick={() => toggle(p.id)}>
             <div className="row">
-              <span className="avatar">{iniciais(p.nome)}</span>
+              <Brasao clan={p.clan} nome={p.nome} />
               <div>
-                <b>{p.nome}</b> {!p.aprovado && <span className="badge">pendente</span>} <Link to={`/personagens/${p.id}`} onClick={(e) => e.stopPropagation()}>detalhe</Link>
+                <b>{p.nome}</b> {!p.aprovado && <span className="badge">pendente</span>}{' '}
+                {ficha[p.id] && <span className="badge" title="Possui ficha (história/planilha/rumores/antecedentes)">📋 ficha</span>}{' '}
+                <Link to={`/personagens/${p.id}`} onClick={(e) => e.stopPropagation()}>detalhe</Link>
                 <div className="small muted">{p.seita} · {p.clan}</div>
                 <div className="small">{p.narrador ? <span className="badge badge-narrador">Narrador</span> : <span className="badge">Jogador</span>} <b>{p.jogador}</b></div>
+                {isNarrador && (
+                  <div className="row" style={{ marginTop: 8 }} onClick={(e) => e.stopPropagation()}>
+                    {p.aprovado
+                      ? <button className="btn btn-sm" disabled={saving[p.id]} onClick={() => aprovar(p.id, false)}>Reprovar</button>
+                      : <button className="btn btn-sm btn-primary" disabled={saving[p.id]} onClick={() => aprovar(p.id, true)}>Aprovar</button>}
+                  </div>
+                )}
               </div>
             </div>
             {open[p.id] && (
