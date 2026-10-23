@@ -17,13 +17,15 @@ export function Layout({ children }: { children: ReactNode }) {
           <Link to="/" className="brand" onClick={() => setMenuOpen(false)}><span className="brand-mark">🧛</span> Live Action</Link>
           <button
             className="menu-btn"
+            type="button"
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((o) => !o)}
           >
             {menuOpen ? '✕' : '☰'}
           </button>
-          <nav className={`topnav${menuOpen ? ' open' : ''}`}>
+          <nav className={`topnav${menuOpen ? ' open' : ''}`} aria-label="Navegação principal">
+            <NavLink to="/" end onClick={() => setMenuOpen(false)}>Início</NavLink>
             <NavLink to="/personagens" onClick={() => setMenuOpen(false)}>Personagens</NavLink>
             <NavLink to="/acoes" onClick={() => setMenuOpen(false)}>Ações</NavLink>
             <NavLink to="/dados" onClick={() => setMenuOpen(false)}>Dados</NavLink>
@@ -34,10 +36,10 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <div className="container">{children}</div>
+      <main className="container">{children}</main>
       <nav className="bottomnav" aria-label="Navegação principal">
         <NavLink to="/" end>🏠<span>Início</span></NavLink>
-        <NavLink to="/personagens">🧛<span>Personas</span></NavLink>
+        <NavLink to="/personagens">🧛<span>Personagens</span></NavLink>
         <NavLink to="/acoes">⚔️<span>Ações</span></NavLink>
         <NavLink to="/dados">🎲<span>Dados</span></NavLink>
       </nav>

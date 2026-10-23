@@ -4,6 +4,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../lib/firebase';
 import { AuthShell } from '../components/Layout';
+import { PasswordField } from '../components/PasswordField';
 
 function msg(code: string) {
   if (code.includes('email-already-in-use')) return 'E-mail já cadastrado. Tente entrar ou resetar a senha.';
@@ -44,8 +45,8 @@ export default function Signup() {
       }}>
         <label className="field">Nome<input className="input" placeholder="Seu nome e sobrenome" value={nome} onChange={(e) => setNome(e.target.value)} /></label>
         <label className="field">E-mail<input className="input" placeholder="voce@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-        <label className="field">Senha<input className="input" placeholder="6 a 15 caracteres" type="password" value={pass} onChange={(e) => setPass(e.target.value)} /></label>
-        <label className="field">Confirmar senha<input className="input" placeholder="repita a senha" type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} /></label>
+        <PasswordField label="Senha" placeholder="6 a 15 caracteres" value={pass} onChange={setPass} />
+        <PasswordField label="Confirmar senha" placeholder="repita a senha" value={pass2} onChange={setPass2} />
         {err && <div className="alert alert-error">{err}</div>}
         <button className="btn btn-primary" type="submit" disabled={invalid}>Confirmar</button>
       </form>

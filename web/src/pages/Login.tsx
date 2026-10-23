@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../lib/firebase';
 import { AuthShell } from '../components/Layout';
+import { PasswordField } from '../components/PasswordField';
 
 export default function Login() {
   const nav = useNavigate();
@@ -19,7 +20,7 @@ export default function Login() {
         catch { setErr('Login inválido. Confira e-mail/senha.'); }
       }}>
         <label className="field">E-mail<input className="input" placeholder="voce@email.com" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-        <label className="field">Senha<input className="input" placeholder="••••••" type="password" value={pass} onChange={(e) => setPass(e.target.value)} /></label>
+        <PasswordField label="Senha" placeholder="••••••" value={pass} onChange={setPass} />
         {err && <div className="alert alert-error">{err}</div>}
         <button className="btn btn-primary" type="submit">Entrar</button>
       </form>

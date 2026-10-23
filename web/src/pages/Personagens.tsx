@@ -170,24 +170,31 @@ export default function Personagens() {
       {loading && <p className="muted">Carregando…</p>}
       {error && <div className="alert alert-error">{error}</div>}
       {!loading && !error && list.length === 0 && <div className="card"><p className="muted">Nenhum personagem.</p></div>}
-      <div className="stack" style={{ marginTop: 12 }}>
+      <div className="character-grid" style={{ marginTop: 14 }}>
         {list.map((p) => (
-          <div key={p.id} className="card list-item" onClick={() => toggle(p.id)}>
+          <div key={p.id} className="card list-item character-card" onClick={() => toggle(p.id)}>
             <div className="row">
               <Brasao clan={p.clan} nome={p.nome} />
-              <div>
-                <b>{p.nome}</b> {!p.aprovado && <span className="badge">pendente</span>}{' '}
-                {ficha[p.id] && <span className="badge" title="Possui ficha (história/planilha/rumores/antecedentes)">📋 ficha</span>}{' '}
-                <Link to={`/personagens/${p.id}`} onClick={(e) => e.stopPropagation()}>detalhe</Link>
-                <div className="small muted">{p.seita} · {p.clan}</div>
-                <div className="small">{p.narrador ? <span className="badge badge-narrador">Narrador</span> : <span className="badge">Jogador</span>} <b>{p.jogador}</b></div>
-                {isNarrador && (
-                  <div className="row" style={{ marginTop: 8 }} onClick={(e) => e.stopPropagation()}>
+              <div className="character-summary">
+                <div className="character-heading">
+                  <b className="character-name">{p.nome}</b>
+                  <div className="character-tags">
                     {p.aprovado
-                      ? <button className="btn btn-sm" disabled={saving[p.id]} onClick={() => aprovar(p.id, false)}>Reprovar</button>
-                      : <button className="btn btn-sm btn-primary" disabled={saving[p.id]} onClick={() => aprovar(p.id, true)}>Aprovar</button>}
+                      ? <span className="badge badge-aprovado">aprovado</span>
+                      : <span className="badge badge-pendente">pendente</span>}
+                    {ficha[p.id] && <span className="badge" title="Possui ficha (história/planilha/rumores/antecedentes)">📋 ficha</span>}
                   </div>
-                )}
+                </div>
+                <div className="small muted">{p.seita} · {p.clan}</div>
+                <div className="small character-player">{p.narrador ? <span className="badge badge-narrador">Narrador</span> : <span className="badge">Jogador</span>} <b>{p.jogador}</b></div>
+                <div className="character-actions" onClick={(e) => e.stopPropagation()}>
+                  <Link className="character-detail" to={`/personagens/${p.id}`}>Ver detalhes <span aria-hidden="true">→</span></Link>
+                  {isNarrador && (
+                    p.aprovado
+                      ? <button className="btn btn-sm" disabled={saving[p.id]} onClick={() => aprovar(p.id, false)}>Reprovar</button>
+                      : <button className="btn btn-sm btn-primary" disabled={saving[p.id]} onClick={() => aprovar(p.id, true)}>Aprovar</button>
+                  )}
+                </div>
               </div>
             </div>
             {open[p.id] && (

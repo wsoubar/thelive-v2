@@ -150,12 +150,14 @@ export default function Home() {
               to={`/personagens/${c.id}`}
             >
               <ClanCrest clan={c.clan} size={52} />
-              <div>
-                <b>{c.nome}</b>{" "}
+              <div className="home-card-content">
+                <div className="home-card-heading">
+                  <b className="character-name">{c.nome}</b>
                 {c.aprovado
                   ? <span className="badge badge-aprovado">aprovado</span>
                   : <span className="badge badge-pendente">pendente</span>}
-                <div className="small muted">
+                </div>
+                <div className="home-card-meta small muted">
                   {c.clan} · {c.seita} · {c.jogador}
                 </div>
               </div>
