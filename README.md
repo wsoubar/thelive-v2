@@ -41,7 +41,6 @@ node ../tools/migrate/migrate.mjs --export ... --service-account ... --commit
 Live: https://wsoubar.github.io/thelive-v2/
 
 Automático via `.github/workflows/deploy.yml` a cada push na `main` (usa Secrets `VITE_FIREBASE_*` — já configurados).
-Manual: `cd web && npm run deploy` (branch `gh-pages`). Depois ative `Settings → Pages → gh-pages`.
 
 ## Firebase (regras + migração)
 
